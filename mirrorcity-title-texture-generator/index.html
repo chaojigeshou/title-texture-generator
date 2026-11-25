@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<!--
+SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+https://polyformproject.org/licenses/noncommercial/1.0.0
+Required Notice: Copyright 镜中都市 · 称号贴图生成器作者。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>镜中都市 · 称号贴图生成器</title>
+<meta name="description" content="镜中都市称号贴图生成器：43 套模板、139 个绘制模块、6 套主题，支持文字动画、逐帧预览、批量文案、精灵图与 PNG / GIF / 图标导出。">
+<meta property="og:title" content="镜中都市 · 称号贴图生成器">
+<meta property="og:description" content="43 套模板 · 17 个称号系列 · 139 个模块 · 文字动画 / 精灵图 / 批量文案">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0f16'/%3E%3Cpath d='M16 6l8 10-8 10-8-10z' fill='none' stroke='%23d9b877' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+
+  /* 工作台布局：称号库 / 成品画布 / 样式检查器。所有断点共用同一组控件。 */
+  :root{
+    color-scheme:dark;
+    --bg:#0c1116;--panel:#151c23;--panel-2:#1c252e;--field:#10171e;
+    --ink:#eef2f4;--ink-2:#b8c4cc;--ink-3:#8698a5;
+    --line:#28343e;--line-2:#3a4a56;--gold:#e4bb76;--gold-2:#f4d7a1;
+    --gold-dim:rgba(228,187,118,.10);--accent:#8cc8bd;--accent-dim:rgba(140,200,189,.09);
+    --font:"Microsoft YaHei UI","Microsoft YaHei","Noto Sans SC","PingFang SC",system-ui,sans-serif;
+    --mono:"Cascadia Mono",Consolas,monospace;--t:150ms ease;--header-height:64px;
+    --library-width:224px;--inspector-width:336px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;min-width:0}
+  body{height:100dvh;display:grid;grid-template-rows:var(--header-height) auto minmax(0,1fr) 30px;overflow:hidden;
+    background:var(--bg);color:var(--ink);font:13px/1.55 var(--font);-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none}
+  button:disabled{cursor:not-allowed;opacity:.42}
+  a{color:var(--accent)}
+  [hidden],.hidden,.hide{display:none!important}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  :where(button,summary,input,select,textarea){border-radius:5px}
+  ::selection{background:#4d685f;color:#fff}
+  *{scrollbar-width:thin;scrollbar-color:#3a4853 transparent}
+  ::-webkit-scrollbar{width:7px;height:7px}
+  ::-webkit-scrollbar-thumb{border:2px solid transparent;border-radius:9px;background:#3a4853;background-clip:padding-box}
+  .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .skip{position:fixed;left:14px;top:-60px;z-index:120;padding:10px 16px;background:var(--gold);color:#241b0e;text-decoration:none}
+  .skip:focus{top:10px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:8px 12px;border:1px solid var(--line-2);
+    border-radius:6px;background:var(--panel-2);color:var(--ink);font-size:12px;font-weight:550;line-height:1.4;white-space:nowrap;
+    transition:background var(--t),border-color var(--t),color var(--t)}
+  .btn:hover:not(:disabled){background:#26333e;border-color:#657987}
+  .btn.primary,.btn.blue{background:var(--gold);border-color:var(--gold);color:#221b10;font-weight:650}
+  .btn.primary:hover:not(:disabled),.btn.blue:hover:not(:disabled){background:var(--gold-2);border-color:var(--gold-2)}
+  .btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--line)}
+  .btn.quiet{background:transparent;color:var(--ink-3);border-color:transparent}
+  .btn.quiet:hover:not(:disabled){color:var(--ink);background:var(--panel-2);border-color:transparent}
+  .btn.sm{min-height:30px;padding:5px 9px;font-size:11px}
+  .search-clear{min-width:30px;padding:4px;font-size:17px}
+  .hint{margin:0;font-size:11px;color:var(--ink-3);line-height:1.75;overflow-wrap:anywhere}
+  .eyebrow{display:block;font:10px/1.5 var(--mono);letter-spacing:.14em;color:var(--ink-3)}
+
+  /* 顶栏：文件与整批输出，单张输出留在画布旁。 */
+  .cmd{grid-row:1;position:relative;z-index:30;display:flex;align-items:center;gap:18px;padding:0 22px;background:#11181e;border-bottom:1px solid var(--line)}
+  .cmd-brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .mark{display:grid;place-items:center;flex:none;width:33px;height:36px;border:1px solid #8c754f;color:var(--gold);font-size:17px;font-weight:700;
+    clip-path:polygon(0 0,75% 0,100% 24%,100% 100%,25% 100%,0 76%);background:#24241f}
+  .cmd h1{font-size:15px;letter-spacing:.06em;line-height:1.4;margin:0;font-weight:650}
+  .cmd-sub{margin:1px 0 0;color:var(--ink-3);font:9px/1.4 var(--mono);letter-spacing:.18em}
+  .cmd-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex:none}
+  .header-editor{display:none}
+  .batch-menu{position:relative}
+  summary{cursor:pointer;user-select:none}
+  .batch-menu>summary{list-style:none}
+  .batch-menu>summary::-webkit-details-marker{display:none}
+  .batch-menu>summary::after{content:"⌄";font-size:13px;margin-left:8px}
+  .batch-menu[open]>summary{border-color:var(--gold)}
+  .batch-menu[open]>summary::after{transform:rotate(180deg)}
+  .export-options{position:absolute;top:calc(100% + 9px);right:0;z-index:45;display:grid;gap:5px;width:264px;max-width:calc(100vw - 24px);
+    max-height:calc(100dvh - 88px);overflow:auto;padding:10px;border:1px solid var(--line-2);border-radius:8px;background:#1a232c;box-shadow:0 18px 48px #0008}
+  .export-options .btn{justify-content:flex-start;text-align:left}
+  .export-options p{margin:5px 4px;color:var(--ink-3);font-size:11px;line-height:1.7}
+  .menu-divider{height:1px;background:var(--line);margin:5px 0}
+
+  /* 全局任务进度不属于任何面板，打开抽屉后仍可取消。 */
+  .task-progress{grid-row:2;position:relative;z-index:20;padding:9px 22px 8px;border-bottom:1px solid #65563e;background:#25251f}
+  .task-row{display:flex;align-items:center;gap:12px}
+  .task-row p{flex:1;min-width:0;margin:0;color:var(--gold-2);font-size:12px;overflow-wrap:anywhere}
+  .task-progress progress{display:block;width:100%;height:3px;margin-top:7px;border:0;border-radius:2px;overflow:hidden;accent-color:var(--gold);background:#12171b}
+  .task-progress progress::-webkit-progress-bar{background:#12171b}
+  .task-progress progress::-webkit-progress-value{background:var(--gold);transition:width .15s ease}
+
+  /* 主体无最大宽度，三列分别滚动，画布保持中心。 */
+  .wb{grid-row:3;display:grid;grid-template-columns:var(--library-width) minmax(0,1fr) var(--inspector-width);min-height:0;min-width:0}
+  .library-panel,.console{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--panel)}
+  .library-panel{border-right:1px solid var(--line)}
+  .console{border-left:1px solid var(--line)}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;height:66px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .panel-head h2{margin:2px 0 0;font-size:14px;letter-spacing:.02em;font-weight:650}
+  .panel-head .eyebrow{font-size:9px}
+  .drawer-close{display:none}
+  .panel-label{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin:0;padding:13px 15px 8px;color:var(--ink-3);font-size:10px;letter-spacing:.06em;font-weight:500}
+  .panel-label span{font-size:10px;color:#667f8d;letter-spacing:0}
+  .library-body{display:flex;flex-direction:column;flex:1;min-height:0}
+  .family-list{display:flex;flex-direction:column;gap:3px;overflow-y:auto;overscroll-behavior:contain;min-height:88px;flex:0 1 36%;padding:0 8px 10px}
+  .family-list .fam{flex:none;display:flex;align-items:center;min-height:33px;width:100%;text-align:left;padding:7px 10px;border:1px solid transparent;
+    border-radius:5px;background:transparent;color:var(--ink-2);font-size:11px;line-height:1.55;white-space:normal;overflow-wrap:anywhere}
+  .family-list .fam:hover{background:#202b34;color:var(--ink)}
+  .family-list .fam.on{background:var(--accent-dim);border-color:#35544f;color:#b5e3d9;box-shadow:inset 2px 0 var(--accent);font-weight:600}
+  .library-items{display:flex;flex-direction:column;flex:1;min-height:130px;border-top:1px solid var(--line)}
+  .library-items .panel-label{padding-top:12px;padding-bottom:9px}
+  #titleResultCount{font:10px/1.5 var(--mono);letter-spacing:0;text-align:right;color:var(--ink-3)}
+  .title-search-row{display:flex;align-items:center;gap:4px;padding:0 12px 10px;flex:none}
+  .search{display:block;flex:1;min-width:0;width:100%;min-height:35px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--field);font-size:11px;line-height:1.5}
+  .search::placeholder{color:#7e929f;opacity:1}
+  .search::-webkit-search-cancel-button{display:none}
+  .search:hover{border-color:var(--line-2)}
+  .film{display:flex;flex-direction:column;gap:3px;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 8px 12px}
+  .fl{display:flex;align-items:center;gap:9px;flex:none;text-align:left;width:100%;padding:10px;border:1px solid transparent;border-radius:5px;color:var(--ink-2);font-size:12px;line-height:1.5}
+  .fl i{flex:none;display:block;width:6px;height:6px;border-radius:1px;transform:rotate(45deg)}
+  .fl span{min-width:0;overflow-wrap:anywhere}
+  .fl:hover{background:#222c35;color:var(--ink)}
+  .fl.on{background:#2b302c;color:var(--gold-2);border-color:#5b5140;box-shadow:inset 2px 0 var(--gold)}
+  .library-note{flex:none;padding:11px 15px;border-top:1px solid var(--line);color:var(--ink-3);font-size:10px;line-height:1.7}
+  .library-note p{margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .library-items>.empty-state{margin:0 12px 10px;padding:10px;font-size:11px}
+
+  /* 中央成品区 */
+  .stage{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:24px 28px 34px;display:flex;flex-direction:column;gap:15px;
+    background:radial-gradient(ellipse at 50% 0%,#18232b60,transparent 65%),var(--bg)}
+  .workspace-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+  .workspace-copy{min-width:0;flex:1}
+  .context-line{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:7px;color:var(--ink-3);font-size:11px}
+  .context-line .context-label{color:#647d8b}
+  .context-line .context-label::after{content:"/";margin-left:9px;color:#40515e}
+  #familyTitle{font-weight:550;color:var(--ink-2)}
+  #heroName{font-size:24px;font-weight:650;letter-spacing:.02em;line-height:1.4;margin:0;overflow-wrap:anywhere}
+  #heroMeta{display:block;color:var(--ink-3);font-size:10px;line-height:1.6;margin-top:5px;overflow-wrap:anywhere}
+  .workspace-heading>.btn{margin-top:26px;flex:none;color:var(--gold-2)}
+  .content-kind{display:inline-flex;align-items:center;flex:none;border:1px solid var(--line-2);border-radius:4px;padding:2px 6px;color:var(--ink-2);font-size:9px;line-height:1.6}
+  .content-kind[data-kind="canon"]{color:var(--accent);background:var(--accent-dim);border-color:#35524e}
+  .content-kind[data-kind="original"]{color:var(--gold);background:var(--gold-dim);border-color:#5c4c35}
+  .open-library{display:none}
+  .editor-tools{display:flex;align-items:center;gap:6px;min-height:28px}
+  .editor-tools .btn{min-height:27px;padding:4px 9px;font-size:10px}
+  .editor-tools .hint{margin-left:auto;font-size:10px;text-align:right}
+  .notice{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 13px;border:1px solid #65583e;border-radius:6px;background:var(--gold-dim)}
+  .notice-copy{flex:1;min-width:150px;color:var(--ink-2);font-size:11px;line-height:1.75}
+  .notice-copy b{display:block;color:var(--gold-2);font-weight:600}
+  .hero{flex:none;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#121a22}
+  .preview-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:8px 13px;border-bottom:1px solid var(--line)}
+  .preview-toolbar>b{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:500;letter-spacing:.03em;color:var(--ink-2)}
+  .live-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px #8cc8bd50}
+  .preview-controls{display:flex;align-items:center;gap:9px}
+  .preview-controls>.btn{min-height:27px;font-size:10px;padding:4px 6px}
+  .preview-backgrounds{display:flex;align-items:center;padding:2px;border:1px solid var(--line);border-radius:5px;background:#0d141b}
+  .preview-backgrounds button{min-height:24px;padding:4px 8px;font-size:10px;line-height:1.4;color:var(--ink-3);border-radius:3px}
+  .preview-backgrounds button[aria-pressed="true"]{background:#2c3b46;color:#d8e5ea}
+  .hero-canvas,.shot,.icon-shot,.cmp{background:repeating-conic-gradient(#111921 0% 25%,#17212b 0% 50%) 50%/20px 20px}
+  body[data-preview-bg="dark"] .hero-canvas,body[data-preview-bg="dark"] .shot,body[data-preview-bg="dark"] .icon-shot,body[data-preview-bg="dark"] .cmp{background:#080d13}
+  body[data-preview-bg="light"] .hero-canvas,body[data-preview-bg="light"] .shot,body[data-preview-bg="light"] .icon-shot,body[data-preview-bg="light"] .cmp{background:#e7ebef}
+  .hero-canvas{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:230px;padding:44px 20px}
+  .hero-canvas::after{content:"560 × 160 / 透明画布";position:absolute;right:13px;bottom:10px;font:9px/1.4 var(--mono);letter-spacing:.02em;color:#698291;pointer-events:none}
+  body[data-preview-bg="light"] .hero-canvas::after{color:#667b87}
+  .hero-canvas canvas{display:block;width:100%;max-width:780px;height:auto;aspect-ratio:7/2}
+  .timeline{min-width:0;padding:12px 13px;border-top:1px solid var(--line);background:#151e26}
+  .timeline-heading,.timeline-controls,.timeline-track{display:flex;align-items:center;gap:8px;min-width:0}
+  .timeline-heading{justify-content:space-between;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:var(--ink-2)}
+  .timeline-heading>b{font-weight:550}.timeline-heading>output{font:10px/1.6 var(--mono);color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .timeline-track>input{width:100%;min-width:0;min-height:32px;margin:0;accent-color:var(--gold);cursor:pointer}
+  .timeline-track>.btn{flex:none;min-width:32px;min-height:32px;padding:5px;font-size:14px}
+  .timeline-controls{flex-wrap:wrap;margin-top:5px}.timeline-controls>.btn{min-height:30px;padding:5px 8px;font-size:10px}
+  .timeline-speed{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:10px;color:var(--ink-3)}
+  .timeline-speed>select{min-width:66px;min-height:30px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--field);color:var(--ink);font:11px var(--mono)}
+  .timeline-hint{margin:7px 0 0;color:var(--ink-3);font-size:9px;line-height:1.7}
+  .hero-bar{display:flex;align-items:center;gap:12px;padding:13px;border-top:1px solid var(--line)}
+  .export-label{color:var(--ink-3);font-size:10px;flex:none}
+  .hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px;flex:1}
+  .hero-actions .btn{min-height:34px;padding:8px 14px}
+  .hero-bar>.btn{font-size:11px}
+  .output-summary{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;padding:8px 13px 10px;border-top:1px solid var(--line);color:var(--ink-3);font-size:9px;line-height:1.8}
+  .output-summary>b{font-size:9px;color:var(--ink-2);font-weight:500}
+  .output-summary>span{font-variant-numeric:tabular-nums}
+  .output-summary>.btn{margin-left:auto;min-height:22px;padding:2px 0;font-size:10px;color:var(--accent)}
+  .title-info{border-bottom:1px solid var(--line);font-size:11px}
+  .title-info>summary{display:flex;align-items:center;gap:8px;list-style:none;color:var(--ink-2);padding:1px 0 12px}
+  .title-info>summary::-webkit-details-marker{display:none}
+  .title-info>summary::before{content:"＋";font-size:14px;color:var(--ink-3)}
+  .title-info[open]>summary::before{content:"−"}
+  .title-info>summary .content-kind{margin-left:auto}
+  .title-info-body{padding:2px 0 16px;line-height:1.8;color:var(--ink-2)}
+  .title-info-body dl{display:grid;gap:9px;margin:0}
+  .title-info-body dl>div{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px}
+  .title-info-body dt{color:var(--ink-3)}
+  .title-info-body dd{margin:0;overflow-wrap:anywhere}
+  .lore-sources{margin-top:13px;display:grid;gap:6px}
+  .lore-sources>a,.lore-source,.source-chip{display:block;overflow-wrap:anywhere;color:var(--ink-3);font-size:10px}
+  .source-chip{display:block;max-width:100%;white-space:normal;font-family:var(--mono);background:var(--field);padding:7px 9px;border:1px solid var(--line);border-radius:4px}.lore-sources a{color:var(--accent);text-underline-offset:3px;overflow-wrap:anywhere}
+  .title-info-note{margin:12px 0 0;color:var(--ink-3);font-size:10px}
+  .compare-panel{padding:13px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+  .compare-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .compare-tools .hint{font-size:10px}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cmp{position:relative;min-width:0;padding:30px 8px 8px;border:1px solid var(--line);border-radius:5px}
+  .cmp canvas{width:100%;height:auto;display:block}
+  .cmp-tag{position:absolute;top:7px;left:8px;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-2);font-size:10px}
+
+  /* 系列作品网格与操作说明随中央区域滚动。 */
+  .title-browser{min-width:0}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin:1px 0 13px}
+  .stage-head h3{margin:0;font-size:13px;font-weight:600;letter-spacing:.04em}
+  .stage-head>span{font-size:10px;color:var(--ink-3)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:12px}
+  .card{min-width:0;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer;transition:border-color var(--t),background var(--t)}
+  .card:hover{border-color:#536775;background:#1b252e}
+  .card.sel{border-color:#8b754e;box-shadow:inset 0 0 0 1px #8b754e33;background:#242720}
+  .shot{line-height:0;overflow:hidden;border:1px solid #1d2b36;border-radius:4px}
+  .card canvas{display:block;width:100%;height:auto}
+  .meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:9px 2px 2px;min-width:0}
+  .name{display:flex;align-items:center;gap:6px;flex:1;min-width:100px;font-size:11px;color:var(--ink-2)}
+  .name b{min-width:0;max-width:100%;font-weight:550;white-space:normal;overflow-wrap:anywhere}
+  .name em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-size:10px;color:var(--ink-3)}
+  .name .dot{width:5px;height:5px;transform:rotate(45deg);border-radius:1px;flex:none}
+  .btns{display:flex;gap:4px;margin-left:auto;flex:none}
+  .btns .btn{min-height:25px;padding:4px 7px;font:10px/1.4 var(--mono)}
+  .workbench-notes{margin-top:3px;border-top:1px solid var(--line);padding-top:13px;font-size:10px;color:var(--ink-3)}
+  .workbench-notes summary{width:fit-content;color:var(--ink-2)}
+  .workbench-notes p{margin:9px 0 0;line-height:1.85;overflow-wrap:anywhere}
+
+  /* 右侧检查器：页签固定，面板内容单独滚动。 */
+  .console-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .console-actions .btn{font-size:10px;min-height:28px;padding:4px 7px}
+  .tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));flex:none;padding:0 12px;border-bottom:1px solid var(--line)}
+  .tab{position:relative;min-height:44px;padding:10px 3px;border-radius:0;color:var(--ink-3);font-size:12px;border-bottom:2px solid transparent;white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--gold-2);border-bottom-color:var(--gold)}
+  .panes{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:17px 15px 22px}
+  .pane{display:none;min-width:0}
+  .pane.on{display:block}
+  .pane-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin:0 0 14px;line-height:1.6}
+  .pane-head>b{font-size:12px;font-weight:600;color:var(--ink)}
+  .pane-head>span{font-size:10px;color:var(--ink-3)}
+  .pane-head>em{margin-left:auto;padding:2px 6px;max-width:100%;border-radius:3px;background:var(--gold-dim);color:var(--gold);font-size:10px;line-height:1.6;font-style:normal;overflow-wrap:anywhere}
+  .mod-tools{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+  .mod-tools .search{flex:1;min-width:140px}
+  .filter-fold{margin-bottom:11px;border:1px solid var(--line);border-radius:5px}
+  .filter-fold>summary{display:flex;align-items:center;gap:7px;padding:8px 9px;list-style:none;color:var(--ink-2);font-size:11px}
+  .filter-fold>summary::-webkit-details-marker{display:none}
+  .filter-fold>summary::before{content:"▸";color:var(--ink-3);font-size:10px}
+  .filter-fold[open]>summary::before{transform:rotate(90deg)}
+  .filter-fold>summary>span{margin-left:auto;color:var(--ink-3);font-size:10px}
+  .filter-fold[open]>summary{border-bottom:1px solid var(--line)}
+  .filter-tags{display:flex;flex-wrap:wrap;gap:5px;padding:9px}
+  .filter-tag{display:flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid var(--line);border-radius:4px;font-size:10px;color:var(--ink-2)}
+  .filter-tag:hover{border-color:var(--line-2)}
+  .filter-tag[aria-pressed="true"]{border-color:#6b593d;color:var(--gold-2);background:var(--gold-dim)}
+  .filter-tag span{font:9px var(--mono);color:var(--ink-3)}
+  .filter-results{font-size:10px;color:var(--ink-3);margin:0 0 10px}
+  .tpls{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+  .tpl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name tag" "hint hint";gap:6px 8px;position:relative;min-width:0;width:100%;
+    padding:12px;text-align:left;border:1px solid var(--line);border-radius:6px;background:#19222a;transition:background var(--t),border-color var(--t)}
+  .tpl:hover{border-color:#617481;background:#202c35}
+  .tpl.on{border-color:#87724d;background:#2b2c23;box-shadow:inset 2px 0 var(--gold)}
+  .tpl-name{grid-area:name;font-size:12px;font-weight:600;line-height:1.6;overflow-wrap:anywhere}
+  .tpl-tag{grid-area:tag;align-self:start;justify-self:end;padding:2px 5px;border-radius:3px;background:#2c3942;color:var(--ink-2);font-size:9px;line-height:1.6}
+  .tpl.on .tpl-tag{background:#4b422f;color:var(--gold-2)}
+  .tpl.has-preview{grid-template-areas:"preview preview" "name tag" "hint hint"}
+  .tpl-preview{grid-area:preview;width:100%;height:auto;aspect-ratio:3.5;display:block;border-radius:4px;background:#101720}
+  .collection-entry{padding:12px;margin:0 0 14px;border:1px solid #4b645c;border-radius:6px;background:#1a2928}
+  .collection-entry>b{font-size:12px;color:#c8e8df}.collection-entry>p{margin:6px 0 10px;font-size:10px;line-height:1.8;color:#a3bbb6}
+  .collection-entry .mod-tools{margin:0;flex-wrap:wrap}.collection-entry .btn{white-space:normal}
+  .tpl-hint{grid-area:hint;color:var(--ink-3);font-size:10px;line-height:1.75;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .empty-state{padding:14px;border:1px dashed var(--line-2);border-radius:5px;font-size:12px;color:var(--ink-3);line-height:1.7;text-align:center}
+  .modules{display:grid;gap:16px;min-width:0}
+  .mod-group{min-width:0;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .mod-head{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .mod-head>b{font-size:11px;font-weight:600;color:var(--ink-2)}
+  .mod-head>span{font-size:10px;color:var(--ink-3)}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+  .chip{max-width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:4px;color:var(--ink-2);font-size:10px;line-height:1.5;background:#19222a;white-space:normal;overflow-wrap:anywhere}
+  #modules .chip{scroll-margin-block-start:calc(var(--module-help-height,112px) + 12px);scroll-margin-block-end:12px}
+  .chip:hover{border-color:#617481;color:var(--ink)}
+  .chip.on{border-color:#716044;background:var(--gold-dim);color:var(--gold-2)}
+  .chip[data-anim="1"]{border-style:dashed}
+  .chip[data-anim="1"].on{border-style:solid}
+  .chip[data-collection="distinct"]::after{content:'新';display:inline-block;margin-left:5px;color:#a5d9c7;font-size:8px}
+  .toggle{display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--ink-2);cursor:pointer;padding:4px 0;white-space:nowrap}
+  .toggle input{margin:0;accent-color:var(--gold)}
+  .module-filters{display:flex;align-items:center;flex-wrap:wrap;gap:5px 12px;min-width:0;margin-bottom:8px}
+  .module-category{display:flex;align-items:center;gap:8px;flex:1 1 100%;min-width:0;color:var(--ink-3);font-size:11px}
+  .module-category>select{flex:1;min-width:0;max-width:100%;min-height:34px;padding:6px 8px;border:1px solid var(--line);border-radius:5px;background:var(--field);color:var(--ink-2);font-size:11px}
+  .module-results{margin:0 0 10px;color:var(--ink-3);font-size:10px;line-height:1.7;overflow-wrap:anywhere}
+  .module-info{position:sticky;top:0;z-index:2;min-width:0;margin:0 0 12px;padding:10px 11px;border:1px solid var(--line-2);border-radius:5px;background:#19222a;box-shadow:0 3px 8px #0003;overflow-wrap:anywhere}
+  .module-info>h3{margin:0;font-size:12px;font-weight:600;color:var(--ink)}
+  .module-info-meta{margin:4px 0 5px;font-size:10px;line-height:1.6;color:var(--gold-2)}
+  .module-info>.hint{font-size:10px;line-height:1.7}
+  .module-selection{min-width:0;margin:0 0 14px;padding:0 10px;border:1px solid var(--line);border-radius:5px;font-size:11px;background:#151f26}
+  .module-selection>summary{padding:10px 0;color:var(--ink-2);cursor:pointer}
+  .module-selection[open]>summary{border-bottom:1px solid var(--line)}
+  .module-selection .mod-tools{margin:10px 0 7px}
+  .module-selection>.hint{margin:0 0 11px;font-size:10px;line-height:1.65}
+  .module-parameters{min-width:0;margin:0 0 14px;border:1px solid #5c513c;border-radius:5px;background:#20231f}
+  .module-parameters>summary{display:flex;align-items:center;gap:6px;min-height:40px;padding:9px 10px;font-size:11px;color:var(--gold-2);cursor:pointer;list-style:none}
+  .module-parameters>summary::-webkit-details-marker{display:none}.module-parameters>summary::before{content:"＋"}.module-parameters[open]>summary::before{content:"−"}
+  .module-parameters>summary>span{margin-left:auto;font-size:10px;color:var(--ink-3)}
+  .module-parameters-body{padding:0 10px 10px}.module-parameters-body>.hint{font-size:10px;line-height:1.7}
+  .module-param-group{min-inline-size:0;margin:0;padding:11px 0 3px;border:0;border-top:1px solid var(--line)}
+  .module-param-head{display:flex;align-items:center;gap:7px;margin-bottom:8px;min-width:0}.module-param-head>h4{margin:0;flex:1;font-size:11px;color:var(--ink-2);font-weight:550;overflow-wrap:anywhere}
+  .module-param-head>.btn{flex:none;font-size:10px;min-height:29px;padding:4px 6px}
+  .module-param-field{margin-bottom:10px}.module-param-field>span{display:flex;align-items:baseline;justify-content:space-between;gap:9px;color:var(--ink-2)}
+  .module-param-field output{font:11px var(--mono);color:var(--gold-2)}.module-param-field>small{font-size:10px;line-height:1.65;color:var(--ink-3)}
+  .module-param-field input[type="range"]{min-height:32px;margin:0}.module-param-field select{font-size:12px}
+  #btnModuleParameters{margin-top:7px;min-height:30px;font-size:10px;padding:5px 7px;color:var(--gold-2)}
+  .chip[data-adjustable="true"]::after{content:"调";margin-left:5px;padding:1px 3px;border-radius:2px;background:#474332;color:#e0ce9e;font-size:8px}
+  .module-summary-row{display:grid;grid-template-columns:46px minmax(0,1fr);gap:10px;border-bottom:1px solid var(--line);padding:8px 0;font-size:10px}
+  .module-summary-row>span{color:var(--ink-3)}
+  .module-summary-row>b{font-weight:500;color:var(--ink-2);overflow-wrap:anywhere}
+  .module-summary-row>b.empty{color:var(--ink-3)}
+  .console-foot{display:flex;align-items:center;flex-wrap:wrap;gap:3px 8px;flex:none;padding:10px 15px;border-top:1px solid var(--line);font-size:9px;line-height:1.6;color:var(--ink-3)}
+  .console-foot>b{max-width:100%;font-weight:500;color:var(--ink-2);overflow-wrap:anywhere}
+  .console-foot>#moduleSummary{margin-left:auto}
+  .fam-strip{display:flex;flex-wrap:wrap;gap:6px}
+  .fam-strip .fam{padding:8px 10px;border:1px solid var(--line);border-radius:5px;font-size:11px;line-height:1.5;color:var(--ink-2);background:#19222a}
+  .fam-strip .fam.on{background:var(--accent-dim);border-color:#4c7068;color:#b8e5dc}
+  .theme-chip{display:inline-flex;align-items:center;gap:7px}
+  .theme-dot{display:block;width:7px;height:7px;border-radius:2px;transform:rotate(45deg)}
+  .custom-entry{margin-bottom:16px;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--field)}
+  .custom-entry .btn{margin-top:9px;color:var(--gold-2)}
+  .form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px 10px}
+  .field{display:flex;flex-direction:column;gap:6px;min-width:0;color:var(--ink-3);font-size:11px}
+  .field input,.field select,.field textarea{display:block;min-width:0;width:100%;min-height:36px;padding:8px;border:1px solid var(--line);border-radius:5px;background:var(--field);color:var(--ink);font-size:12px}
+  .field input:hover,.field select:hover{border-color:var(--line-2)}
+  .field.wide{grid-column:1/-1}
+  .field input[type="color"]{height:35px;padding:3px;cursor:pointer}
+  .text-animation-panel{min-width:0;min-inline-size:0;max-inline-size:100%;margin:18px 0;padding-top:16px;border-top:1px solid var(--line)}
+  .text-animation-panel>.hint{margin:0 0 12px;font-size:10px;line-height:1.7}
+  .text-anim-group{min-width:0;min-inline-size:0;inline-size:100%;max-inline-size:100%;margin:0 0 12px;padding:0;border:0}
+  .text-anim-group>legend{max-inline-size:100%;padding:0 0 7px;color:var(--ink-2);font-size:11px;font-weight:600;white-space:normal;overflow-wrap:anywhere}
+  .text-anim-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;min-width:0;min-inline-size:0;inline-size:100%;max-inline-size:100%}
+  .text-anim-choice{min-width:0;min-inline-size:0;max-inline-size:100%;min-height:33px;padding:6px 4px;border:1px solid var(--line);border-radius:5px;background:var(--field);font-size:11px;color:var(--ink-2);line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+  .text-anim-choice:hover{border-color:var(--line-2);color:var(--ink)}
+  .text-anim-choice[aria-pressed="true"]{border-color:#6b593d;color:var(--gold-2);background:var(--gold-dim)}
+  .text-anim-choice:disabled{opacity:.45;cursor:not-allowed}
+  .text-anim-group>.hint{margin:6px 0 0;font-size:10px;line-height:1.65}
+  .text-anim-strength>span{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .text-anim-strength output{font:11px var(--mono);color:var(--ink-2)}
+  .field input[type="range"]{padding:0;border:0;min-height:28px;background:transparent;accent-color:var(--gold)}
+  #textAnimStrength{margin:0}
+  .text-anim-actions{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 9px}
+  .text-anim-actions>.btn{flex:1;min-inline-size:0;max-inline-size:100%;font-size:11px;white-space:normal;overflow-wrap:anywhere}
+  #textAnimHint,#gifTimingHint{font-size:10px;line-height:1.75;color:var(--ink-2)}
+  #gifTimingHint{margin:10px 0 0}
+  #customPanel>.hint{margin-top:12px;font-size:10px}
+  .workshop-intro{margin:0 0 15px;font-size:11px;line-height:1.85;color:var(--ink-2)}
+  .workshop-card{margin-bottom:14px;border:1px solid var(--line);border-radius:7px;background:var(--field);overflow:hidden}
+  .workshop-card>summary{display:flex;align-items:center;gap:8px;min-height:48px;padding:12px;list-style:none;font-size:12px;color:var(--ink);font-weight:600}
+  .workshop-card>summary::-webkit-details-marker{display:none}.workshop-card>summary::before{content:"▸";color:var(--gold);font-size:10px}
+  .workshop-card[open]>summary::before{transform:rotate(90deg)}.workshop-card>summary>span{margin-left:auto;font-size:9px;font-weight:400;color:var(--ink-3)}
+  .workshop-body{padding:0 12px 13px}.workshop-body>.hint{font-size:10px;line-height:1.8;margin:0 0 12px}
+  .workshop-body .form{gap:11px 9px}.workshop-body .field{font-size:10px}
+  .workshop-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.workshop-actions>.btn{font-size:10px;min-height:34px;padding:7px 9px}
+  .workshop-metrics{margin:12px 0 8px;padding:10px;border:1px solid var(--line);border-radius:5px;font:10px/1.8 var(--mono);color:var(--ink-2);overflow-wrap:anywhere;background:var(--panel);white-space:pre-line}
+  .workshop-metrics[data-error="true"]{border-color:#a45e58;color:#ffb9b0}.sprite-layout{display:grid;gap:3px;margin:9px 0}
+  .sprite-layout>span{display:flex;align-items:center;justify-content:center;aspect-ratio:3.5;border:1px solid #48626e;background:#20323d;color:#9ac7d5;font:9px var(--mono)}
+  .sprite-layout>span[data-empty="true"]{border-style:dashed;opacity:.3;background:transparent}.workshop-caption{font-size:9px;line-height:1.8;color:var(--ink-3);margin:5px 0 10px}
+  .workshop-body textarea{resize:vertical;min-height:150px;max-height:360px;white-space:pre;tab-size:4;font:11px/1.8 var(--mono)}
+  .batch-defaults{margin:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.batch-defaults>summary{padding:9px 0;color:var(--ink-2);font-size:10px}
+  .batch-defaults>.form{padding:4px 0 12px}.batch-status{margin:12px 0 6px;font-size:11px;line-height:1.8;color:var(--ink-2)}
+  .batch-errors{margin:7px 0 12px;padding:9px 10px 9px 27px;border:1px solid #79504a;border-radius:4px;background:#382522;color:#f2b8ae;font-size:10px;line-height:1.85;max-height:175px;overflow-y:auto}
+  .batch-preview{padding:9px;border:1px solid var(--line);border-radius:5px;background:repeating-conic-gradient(#17202a 0% 25%,#202c35 0% 50%) 0 0/16px 16px}
+  .batch-preview canvas{display:block;width:100%;height:auto}.batch-preview>p{margin:6px 0;font-size:10px;color:var(--ink-3);line-height:1.8}
+  .workshop-body select{width:100%}.batch-formats{display:flex;gap:6px;align-items:center;margin-top:12px}.batch-formats>.field{flex:1;min-width:0;margin:0}
+  .workshop-entry{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.workshop-entry>.btn{width:100%;font-size:11px;min-height:36px}
+  .motion-ideas{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 12px}.motion-ideas>.btn{font-size:10px;padding:6px 8px}
+  .output-summary-inline{border-left:2px solid #59634f;background:#222923;padding:9px 11px;margin-bottom:17px;color:var(--ink-2);font-size:10px;line-height:1.8}
+  .output-shortcuts{display:grid;gap:7px;margin-top:15px}
+  .output-shortcuts .btn{font-size:11px}
+  .fav-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 7px;border:1px solid var(--line);border-radius:4px;color:var(--ink-2);font-size:10px}
+  .fav-chip button{padding:3px;color:inherit;font:inherit}
+  .icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+  .icon-card{min-width:0;padding:7px;border:1px solid var(--line);border-radius:6px;text-align:center;background:#19222a}
+  .icon-shot{line-height:0;overflow:hidden;border-radius:4px}
+  .icon-shot canvas{width:100%;height:auto;display:block}
+  .icon-name{font-size:10px;color:var(--ink-2);margin:7px 0;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+  .icon-card .btn{font-size:10px;width:100%}
+
+  /* 状态栏与抽屉 */
+  .foot{grid-row:4;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px;background:#11181e;border-top:1px solid var(--line);font-size:9px;color:var(--ink-3);line-height:1.5}
+  .foot b{font:10px var(--mono);color:var(--ink-2)}
+  .status-stats{display:flex;align-items:center;gap:12px}
+  .foot-note{color:#6b8290}
+  .editor-backdrop{position:fixed;inset:0;z-index:70;background:#03080dad;backdrop-filter:blur(3px);cursor:default;border-radius:0}
+  .mobile-editbar{display:none}
+  .toast{position:fixed;left:50%;bottom:48px;z-index:110;max-width:calc(100vw - 28px);width:max-content;padding:10px 16px;border:1px solid #736142;border-radius:6px;
+    background:#242921;color:var(--gold-2);font-size:12px;line-height:1.7;box-shadow:0 10px 35px #0007;opacity:0;transform:translate(-50%,10px);pointer-events:none;overflow-wrap:anywhere;transition:opacity var(--t),transform var(--t)}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  @media(min-width:1700px){:root{--library-width:244px;--inspector-width:360px}.stage{padding:28px 36px 40px}.hero-canvas{padding:52px 25px}.family-list .fam{font-size:12px}}
+  @media(min-width:1280px) and (max-width:1350px){:root{--library-width:216px;--inspector-width:320px}.stage{padding:22px}.hero-canvas{padding:36px 18px}}
+  @media(max-width:1279px){
+    .wb{grid-template-columns:var(--library-width) minmax(0,1fr)}
+    .console{position:fixed;top:0;right:0;bottom:0;width:min(400px,calc(100vw - 24px));z-index:80;visibility:hidden;transform:translateX(102%);transition:transform .2s ease;
+      border-left:1px solid var(--line-2);box-shadow:-12px 0 50px #0005}
+    body.editor-open .console{visibility:visible;transform:translateX(0)}
+    .console .drawer-close{display:inline-flex}
+    .header-editor{display:inline-flex}
+    .stage{padding:22px 26px 34px}
+    .hero-canvas{padding:40px 20px}
+  }
+  @media(max-width:959px){
+    :root{--header-height:60px}
+    body{grid-template-rows:var(--header-height) auto minmax(0,1fr);padding-bottom:calc(62px + env(safe-area-inset-bottom))}
+    .cmd{padding:0 18px}.cmd h1{font-size:14px}.cmd-sub{font-size:8px}.cmd-actions{gap:6px}
+    .header-editor{display:none}
+    .wb{grid-template-columns:minmax(0,1fr)}
+    .library-panel{position:fixed;top:0;bottom:0;left:0;z-index:80;width:min(310px,calc(100vw - 24px));visibility:hidden;transform:translateX(-102%);transition:transform .2s ease;
+      border-right:1px solid var(--line-2);box-shadow:12px 0 50px #0005}
+    body.library-open .library-panel{visibility:visible;transform:translateX(0)}
+    .library-panel .drawer-close{display:inline-flex}
+    .family-list{flex-basis:37%}
+    .open-library{display:inline-flex;min-height:24px;padding:3px 7px;font-size:10px;margin-right:3px;color:var(--accent)}
+    .stage{padding:20px 24px 28px;gap:13px}
+    #heroName{font-size:23px}
+    .workspace-heading>.btn{margin-top:31px}
+    .hero-canvas{min-height:210px;padding:42px 24px}
+    .foot{display:none}
+    .mobile-editbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;height:calc(62px + env(safe-area-inset-bottom));
+      padding:9px 14px calc(9px + env(safe-area-inset-bottom));background:#131c24f5;border-top:1px solid var(--line-2);backdrop-filter:blur(12px)}
+    .mobile-editbar .btn{min-height:42px;padding:8px 5px;font-size:12px}
+    .mobile-editbar .btn[aria-expanded="true"]{border-color:var(--gold)}
+    .toast{bottom:calc(78px + env(safe-area-inset-bottom))}
+  }
+  @media(max-width:640px){
+    :root{--header-height:56px}
+    .cmd{padding:0 13px;gap:9px}.cmd-brand{gap:8px}.mark{width:26px;height:29px;font-size:14px}.cmd h1{font-size:13px;letter-spacing:.01em}.cmd-sub{display:none}
+    .cmd-actions{gap:5px}.cmd-actions .btn{min-height:32px;padding:6px 8px;font-size:11px}.batch-menu>summary::after{margin-left:3px;font-size:11px}
+    .export-options{right:0;max-height:calc(100dvh - 134px);padding:9px}.export-options .btn{min-height:38px}
+    .stage{padding:16px 14px 25px;gap:12px}.workspace-heading{gap:8px}.context-line{gap:6px;font-size:10px;margin-bottom:6px}.context-label{display:none}
+    .context-line .open-library{display:none}#heroName{font-size:21px}.workspace-heading>.btn{margin-top:27px;font-size:10px;padding:4px 0;min-height:27px}
+    #heroMeta{font-size:9px;margin-top:5px}.content-kind{font-size:8px;padding:1px 5px}
+    .editor-tools{gap:4px}.editor-tools .btn{font-size:9px;min-height:25px;padding:4px 7px}.editor-tools .hint{font-size:9px;line-height:1.5;max-width:55%}
+    .hero{border-radius:7px}.preview-toolbar{padding:7px 9px;gap:6px}.preview-toolbar>b{font-size:9px;gap:5px}.preview-controls{gap:5px}
+    .preview-controls>.btn{font-size:9px;padding:3px;min-height:25px}.preview-backgrounds button{font-size:9px;min-height:23px;padding:4px 6px}
+    .hero-canvas{min-height:0;padding:30px 10px 34px}.hero-canvas::after{font-size:8px;bottom:9px;right:10px}
+    .hero-bar{padding:10px;gap:5px;flex-wrap:wrap}.export-label{display:none}.hero-actions{gap:5px}.hero-actions .btn{padding:7px 10px;font-size:11px;min-height:34px}.hero-bar>.btn{font-size:10px;padding:5px;min-height:30px}
+    .output-summary{padding:7px 10px;gap:2px 9px;font-size:8px}.output-summary>b{display:none}.output-summary>.btn{font-size:9px}
+    .title-info>summary{padding-bottom:10px;font-size:10px}.title-info-body{font-size:10px}.title-info-body dl>div{grid-template-columns:52px minmax(0,1fr);gap:8px}
+    .stage-head h3{font-size:12px}.stage-head>span{font-size:9px}.grid{gap:10px;grid-template-columns:minmax(0,1fr)}
+    .card{padding:7px}.meta{margin-top:8px}.name{font-size:12px}.btns .btn{min-height:29px;padding:5px 9px}
+    .compare{grid-template-columns:minmax(0,1fr)}.compare-tools{align-items:flex-start}.compare-tools .hint{font-size:9px}
+    .notice{padding:10px}.notice-copy{min-width:100%;font-size:10px}.task-progress{padding:8px 12px}.task-row{gap:8px;flex-wrap:wrap}.task-row p{font-size:10px;flex-basis:65%}
+    .console,.library-panel{left:0;right:0;top:auto;bottom:0;width:100%;height:min(88dvh,800px);max-height:100dvh;border:1px solid var(--line-2);border-bottom:0;border-radius:14px 14px 0 0;
+      box-shadow:0 -16px 60px #0008;transform:translateY(102%);padding-bottom:env(safe-area-inset-bottom)}
+    body.editor-open .console,body.library-open .library-panel{transform:translateY(0)}
+    .panel-head{height:60px;padding:10px 16px}.panel-head .eyebrow{font-size:8px}.panel-head h2{font-size:14px}.drawer-close{min-height:34px!important;font-size:12px!important;padding:5px 11px!important}
+    .panes{padding:15px 16px 25px}.tabs{padding:0 14px}.tab{min-height:43px}.console-actions{padding:6px 14px}.console-actions .btn{font-size:11px;min-height:31px}
+    .console-foot{padding:8px 16px;font-size:9px}.tpl{padding:12px}.tpl-name{font-size:13px}.tpl-hint{font-size:11px}.search{font-size:12px;min-height:38px}
+    .family-list{min-height:70px;flex-basis:35%;padding:0 10px 8px}.family-list .fam{min-height:36px;font-size:12px}.library-items{min-height:115px}.film{padding:0 10px 12px}.fl{min-height:43px;font-size:13px}
+    .library-note{font-size:9px;padding:8px 16px}.library-note p{-webkit-line-clamp:2}.mobile-editbar{padding-left:10px;padding-right:10px;gap:5px}.mobile-editbar .btn{font-size:11px}
+    .field input,.field select,.field textarea{font-size:16px}.filter-tag{font-size:11px;padding:7px}.chip{min-height:40px;min-width:44px;font-size:11px;padding:7px 9px}
+    #paneMod .toggle,#paneMod .btn,#paneMod .search,.module-category>select,.module-selection>summary{min-height:40px}
+    .module-filters .toggle{font-size:11px}.module-category>select{font-size:16px}.module-info>.hint{font-size:11px}
+    .text-anim-choice{min-height:40px}
+    .timeline{padding:10px}.timeline-heading{gap:3px}.timeline-heading>output{font-size:9px}
+    .timeline-controls{gap:5px}.timeline-controls>.btn,.timeline-speed>select,.timeline-track>.btn,.timeline-track>input{min-height:40px}
+    .timeline-controls>.btn{font-size:10px;padding:6px}.timeline-speed{gap:4px}.timeline-speed>select{font-size:16px;min-width:66px;max-width:83px}
+    .module-param-field input[type="range"],.module-parameters>summary{min-height:40px}.module-param-field select{font-size:16px}
+    .workshop-actions>.btn,.workshop-entry>.btn,.motion-ideas>.btn{min-height:40px}.workshop-body textarea{font-size:16px}.workshop-card>summary{min-height:48px}.batch-defaults>summary{min-height:40px}
+  }
+  @media(max-width:360px){
+    .cmd{padding:0 10px;gap:5px}.mark{display:none}.cmd h1{font-size:12px}.cmd-actions .btn{font-size:10px;padding:6px 7px}.stage{padding:14px 11px 22px}
+    #heroName{font-size:20px}.workspace-heading>.btn{font-size:9px}.preview-toolbar{gap:5px;padding:7px 8px}.preview-controls{gap:3px}.preview-backgrounds button{padding:4px 5px}
+    .hero-actions .btn{font-size:10px;padding:7px 8px}.hero-bar>.btn{font-size:9px}.output-summary{font-size:8px;gap:2px 7px}.form{gap:11px 8px}.panes{padding-left:13px;padding-right:13px}
+  }
+  @media(max-height:660px) and (min-width:960px){
+    .panel-head{height:54px}.panel-head .eyebrow{display:none}.panel-head h2{margin:0}.stage{padding-top:17px;gap:12px}.hero-canvas{padding-top:25px;padding-bottom:28px;min-height:190px}
+    .family-list{min-height:74px;flex-basis:32%}.library-note{padding-top:8px;padding-bottom:8px}.library-note p{-webkit-line-clamp:2}
+  }
+  @media(max-height:600px) and (max-width:959px){
+    .panel-head{height:48px}.panel-head .eyebrow{display:none}.panel-head h2{margin:0}.console-actions{padding-top:4px;padding-bottom:4px}.tab{min-height:36px}.library-note{display:none}
+    .library-panel,.console{height:100dvh;max-height:100dvh;border-radius:0}.family-list{flex-basis:28%;min-height:65px}.library-items{min-height:100px}
+  }
+  @media(max-height:600px){
+    .module-info{position:static;top:auto}
+    #modules .chip{scroll-margin-block-start:12px}
+  }
+  @media(max-height:480px){
+    .workshop-body textarea{height:84px;min-height:72px;max-height:180px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+</style>
+</head>
+<body>
+<a class="skip" id="skipEditor" href="#console">跳到编辑面板</a>
+<header class="cmd">
+  <div class="cmd-brand"><span class="mark" aria-hidden="true">镜</span><div><h1>称号贴图生成器</h1><p class="cmd-sub">MIRRORCITY / TITLE STUDIO</p></div></div>
+  <div class="cmd-actions" aria-label="项目与导出操作">
+    <button class="btn ghost header-editor" id="btnOpenEditor" type="button" data-open-editor="" aria-controls="console" aria-expanded="false">编辑样式</button>
+    <details class="batch-menu" id="projectMenu">
+      <summary class="btn ghost">项目</summary>
+      <div class="export-options"><p>保存或继续编辑一套称号配置</p>
+        <button class="btn ghost" id="btnExportConfig">导出配置</button>
+        <button class="btn ghost" id="btnImportConfig">导入配置</button>
+        <input type="file" id="configFile" accept="application/json" class="sr">
+        <div class="menu-divider"></div>
+        <button class="btn ghost" id="btnOutputSettings" type="button" data-open-editor="out" aria-controls="console">输出设置</button>
+        <p>草稿自动保存在当前浏览器。导出配置可备份文案、样式和参数。</p>
+      </div>
+    </details>
+    <details class="batch-menu" id="batchExportMenu">
+      <summary class="btn primary">批量导出</summary>
+      <div class="export-options"><p>导出当前系列的全部称号</p>
+        <button class="btn primary" id="btnZip">打包当前系列</button>
+        <button class="btn ghost" id="btnAllPng">全部 PNG</button>
+        <button class="btn ghost" id="btnAllGif">全部 GIF</button>
+        <button class="btn ghost" id="btnAllIcon">全部图标</button>
+        <button class="btn ghost" id="btnPoster">合集海报</button>
+        <div class="menu-divider"></div>
+        <button class="btn ghost" id="btnZipAll">全模板 ZIP</button>
+        <button class="btn ghost" type="button" data-open-production="batch">批量文案工坊 ↗</button>
+        <button class="btn ghost" type="button" data-open-production="sprite">动画精灵图 ↗</button>
+        <p>系列导出包含全部称号；搜索筛选只影响浏览。</p>
+      </div>
+    </details>
+  </div>
+</header>
+<section class="task-progress" id="exportProgress" aria-label="导出进度" hidden>
+  <div class="task-row"><p id="exportProgressText" role="status" aria-live="polite"></p><button class="btn ghost sm" id="btnExportCancel" title="完成当前图片后停止 · Esc">取消导出</button><button class="btn quiet sm" id="btnExportDismiss" hidden>关闭</button></div>
+  <progress id="exportProgressBar" max="1" value="0" aria-label="导出进度"></progress>
+</section>
+<main class="wb">
+  <aside class="library-panel" id="libraryPanel" aria-labelledby="libraryTitle">
+    <div class="panel-head library-head"><div><span class="eyebrow">TITLE LIBRARY</span><h2 id="libraryTitle">称号库</h2></div><button class="btn ghost sm drawer-close" id="btnLibraryClose" type="button" aria-label="关闭称号库">关闭 ×</button></div>
+    <div class="library-body">
+      <h3 class="panel-label">称号系列<span>文案可独立于样式选择</span></h3>
+      <div class="family-list" id="families" role="group" aria-label="称号系列"></div>
+      <select id="optFamily" class="hidden" aria-hidden="true" tabindex="-1"></select>
+      <div class="library-items">
+        <h3 class="panel-label">当前系列<span id="titleResultCount" role="status" aria-live="polite"></span></h3>
+        <div class="title-search-row"><input class="search" id="titleSearch" type="search" placeholder="搜索称号、铭文、编号" aria-label="搜索当前系列的称号"><button class="btn quiet search-clear" id="titleSearchClear" type="button" aria-label="清空称号搜索" hidden>×</button></div>
+        <p class="empty-state" id="titleEmpty" role="status" hidden>没有匹配的称号。试试其他关键词，或清空搜索。</p>
+        <div class="film" id="film" role="group" aria-label="称号快速选择"></div>
+      </div>
+    </div>
+    <div class="library-note"><p id="familyDescription">选择一个系列，再为称号搭配样式。</p></div>
+  </aside>
+
+  <section class="stage" id="previewStage" aria-label="称号预览与内容">
+    <div class="workspace-heading">
+      <div class="workspace-copy"><div class="context-line"><button class="btn ghost open-library" id="btnOpenLibrary" type="button" data-open-library aria-controls="libraryPanel" aria-expanded="false">称号库</button><span class="context-label">工作台</span><span id="familyTitle">称号工作台</span><span class="content-kind" id="familyKind" hidden></span></div><h2 id="heroName">—</h2><span id="heroMeta">—</span></div>
+      <button class="btn quiet sm" id="btnCustomizeCurrent" type="button" data-customize-current aria-controls="customPanel">编辑这条文案 ↗</button>
+    </div>
+    <div class="editor-tools" role="group" aria-label="编辑历史与草稿"><button class="btn ghost sm" id="btnUndo" disabled title="撤销 · Ctrl+Z">撤销</button><button class="btn ghost sm" id="btnRedo" disabled title="重做 · Ctrl+Shift+Z / Ctrl+Y">重做</button><span class="hint" id="draftStatus" role="status" aria-live="polite">修改后自动保存草稿</span></div>
+    <div class="notice" id="draftBanner" hidden><div class="notice-copy"><b>发现上次保存的草稿</b>恢复称号内容、模块组合与导出参数。</div><button class="btn sm" id="btnRestoreDraft">恢复草稿</button><button class="btn quiet sm" id="btnDismissDraft">暂不恢复</button></div>
+
+    <div class="hero" id="heroPreview">
+      <div class="preview-toolbar"><b><span class="live-dot" aria-hidden="true"></span>实时预览</b><div class="preview-controls"><button class="btn quiet sm" id="previewPause" aria-pressed="false" title="暂停或继续预览动画">暂停预览</button><div class="preview-backgrounds" role="group" aria-label="预览背景，仅影响预览"><button id="previewBgChecker" type="button" data-preview-bg="checker" aria-pressed="true" title="棋盘背景，检查透明区域">棋盘</button><button id="previewBgDark" type="button" data-preview-bg="dark" aria-pressed="false" title="在深色背景上查看">深色</button><button id="previewBgLight" type="button" data-preview-bg="light" aria-pressed="false" title="在浅色背景上查看">浅色</button></div></div></div>
+      <div class="hero-canvas"><canvas id="heroCanvas" width="1120" height="320" role="img" aria-label="当前称号预览"></canvas></div>
+      <section class="timeline" id="previewTimeline" aria-labelledby="timelineTitle">
+        <div class="timeline-heading"><b id="timelineTitle">动画时间轴</b><output id="timelinePosition" for="timelineSeek">完整静态图</output></div>
+        <div class="timeline-track"><button class="btn quiet" id="timelinePrev" type="button" aria-label="上一帧" title="上一帧">‹</button><input id="timelineSeek" type="range" min="0" max="15" step="1" value="0" aria-label="动画帧位置" aria-describedby="timelineHint"><button class="btn quiet" id="timelineNext" type="button" aria-label="下一帧" title="下一帧">›</button></div>
+        <div class="timeline-controls"><button class="btn ghost sm" id="timelineReplay" type="button">从头播放</button><button class="btn quiet sm" id="timelineStatic" type="button">完整静态图</button><button class="btn quiet sm" id="heroFrame" type="button">导出此帧</button><label class="timeline-speed">整体速度<select id="playbackSpeed" aria-label="整体动画速度" aria-describedby="timelineHint"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option></select></label></div>
+        <p class="timeline-hint" id="timelineHint">拖动可逐帧检查；整体速度会同步到 GIF。PNG 默认保留完整文字。</p>
+      </section>
+      <div class="hero-bar"><span class="export-label">导出当前</span><div class="hero-actions"><button class="btn primary" id="heroPng">这张 PNG</button><button class="btn" id="heroGif">这张 GIF</button><button class="btn ghost" id="heroIcon">这张图标</button></div><button class="btn quiet sm" id="heroCompare" aria-pressed="false">A/B 对比</button></div>
+      <div class="output-summary" id="outputSummary" aria-label="当前输出摘要"><b>输出</b><span id="summaryPng"></span><span id="summaryGif"></span><span id="summaryIcon"></span><button class="btn quiet" type="button" data-open-editor="out" aria-controls="console">调整参数 ↗</button></div>
+    </div>
+    <details class="title-info" id="titleInfo"><summary><span>称号说明与资料来源</span><span class="content-kind" id="titleKind" hidden></span></summary><div class="title-info-body"><dl><div><dt>称号铭文</dt><dd id="titleDescription">—</dd></div><div id="titleLoreRow"><dt>设定说明</dt><dd id="titleLoreNote">—</dd></div></dl><div class="lore-sources" id="titleSources" aria-label="资料来源"></div><p class="title-info-note">资料来源用于称号事实说明；编号、配色与视觉样式为本项目创作。</p></div></details>
+    <div class="compare-panel" id="compareWrap" hidden><div class="compare-tools"><p class="hint">对比同一称号的两套样式。设为对照后，可继续调整当前样式。</p><button class="btn ghost sm" id="btnPinCompare" aria-pressed="false">设为对照</button></div><div class="compare"><div class="cmp"><span class="cmp-tag" id="cmpLabelA">当前</span><canvas id="cmpA"></canvas></div><div class="cmp"><span class="cmp-tag" id="cmpLabelB">上一个配置</span><canvas id="cmpB"></canvas></div></div></div>
+    <section class="title-browser" aria-labelledby="titleBrowserHeading"><div class="stage-head"><h3 id="titleBrowserHeading">本系列作品</h3><span id="stageCount">—</span></div><div class="grid" id="grid"></div></section>
+    <details class="workbench-notes"><summary>使用说明</summary><p>点击作品或左侧称号切换预览。模板会换用整套模块组合，也可能切换称号系列；需要修改内置称号时，先复制到自定义系列。</p><p>「▶」标记的装饰会动。GIF 与预览呈现动画，PNG 导出固定画面。预览背景仅帮助检查透明区域，不会写入导出的图片。</p><p>连续下载多张时，浏览器可能询问是否允许多个文件下载。也可以使用「打包当前系列」一次下载 ZIP。取消导出会在当前图片处理完成后生效。</p><p>草稿与收藏保存在当前浏览器。跨电脑或长期备份，请从顶栏「项目」导出配置。</p></details>
+  </section>
+
+  <aside class="console" id="console" aria-labelledby="editorTitle">
+    <div class="panel-head console-head"><div><span class="eyebrow">STYLE INSPECTOR</span><h2 id="editorTitle">样式编辑器</h2></div><button class="btn ghost sm drawer-close" id="btnEditorClose" type="button" aria-label="关闭编辑面板">关闭 ×</button></div>
+    <div class="tabs" role="tablist" aria-label="控制台分区"><button class="tab on" role="tab" id="tabTpl" aria-controls="paneTpl" aria-selected="true" tabindex="0" data-pane="paneTpl">模板</button><button class="tab" role="tab" id="tabMod" aria-controls="paneMod" aria-selected="false" tabindex="-1" data-pane="paneMod">模块</button><button class="tab" role="tab" id="tabTheme" aria-controls="paneTheme" aria-selected="false" tabindex="-1" data-pane="paneTheme">文案主题</button><button class="tab" role="tab" id="tabMake" aria-controls="paneMake" aria-selected="false" tabindex="-1" data-pane="paneMake">素材工坊</button><button class="tab" role="tab" id="tabOut" aria-controls="paneOut" aria-selected="false" tabindex="-1" data-pane="paneOut">输出</button></div>
+    <div class="console-actions"><button class="btn quiet sm" id="btnRandom">随机叠加</button><button class="btn quiet sm" id="btnReset">重置模板</button></div>
+    <div class="panes">
+      <!-- 模板 -->
+      <section class="pane on" id="paneTpl" role="tabpanel" aria-labelledby="tabTpl">
+        <div class="pane-head">
+          <b>样式模板</b><span>选用整套搭配</span>
+          <em id="curName">—</em>
+        </div>
+        <section class="collection-entry" aria-labelledby="distinctTitle">
+          <b id="distinctTitle">从不同构图开始</b>
+          <p>上下分层、双栏、竖签、右徽与错层；搭配票券、卷幅、机械组件和字形变换。</p>
+          <div class="mod-tools"><button class="btn quiet sm" type="button" id="btnDistinctTemplates">浏览新构图模板</button><button class="btn ghost sm" type="button" id="btnDistinctModules">查看新增模块</button></div>
+        </section>
+        <div class="mod-tools"><input class="search" id="tplSearch" type="search" placeholder="搜模板名 / 标签 / 说明" aria-label="搜索模板"><button id="tplSearchClear" class="btn quiet search-clear" type="button" aria-label="清空模板搜索" title="清空搜索" hidden>×</button></div>
+        <details class="filter-fold" id="templateFilter"><summary>分类筛选<span id="activeTemplateTag">全部标签</span></summary><div class="filter-tags" id="templateTags" role="group" aria-label="按模板标签筛选"></div></details>
+        <p class="filter-results" id="templateResultCount" role="status" aria-live="polite"></p>
+        <div class="tpls" id="templates" role="group" aria-label="样式模板"></div>
+        <p class="empty-state" id="tplEmpty" role="status" hidden>没有匹配的模板，试试其他关键词或选择“全部标签”。</p>
+      </section>
+
+      <!-- 模块 -->
+      <section class="pane" id="paneMod" role="tabpanel" aria-labelledby="tabMod">
+        <div class="pane-head">
+          <b>模块叠加</b><span>装饰与动效支持多选</span>
+          <em class="count-badge" id="moduleSelectedCount">0</em>
+        </div>
+        <details class="module-selection"><summary>当前模块组合</summary><div id="moduleSummaryList" aria-label="已选择的模块"></div>
+          <div class="mod-tools">
+            <button class="btn ghost sm" id="btnClearDeco" type="button">清空装饰</button>
+            <button class="btn ghost sm" id="btnClearMotion" type="button">清空动效层</button>
+          </div>
+          <p class="hint">清空动效层只移除动效模块，动画装饰和文字动画仍保留。</p>
+        </details>
+        <details class="module-parameters" id="moduleParamsPanel"><summary>模块参数<span id="moduleParamsCount">0 项可调</span></summary><div class="module-parameters-body"><p class="hint" id="moduleParamsEmpty">选择带“调”标记的模块后，可在这里调整结构。</p><div id="moduleParamsFields"></div></div></details>
+        <div class="mod-tools">
+          <input class="search" id="modSearch" type="search" placeholder="搜模块名 / 类别 / 说明" aria-label="搜索模块" aria-controls="modules" aria-describedby="modResultCount">
+          <button id="modSearchClear" class="btn quiet sm" type="button" aria-label="重置模块筛选" title="清除关键词、类别与筛选条件" hidden>重置筛选</button>
+        </div>
+        <div class="module-filters">
+          <label class="module-category">类别<select id="modCategory" aria-controls="modules"><option value="">全部类别</option></select></label>
+          <label class="toggle"><input type="checkbox" id="modSelectedOnly"> 只看已选</label>
+          <label class="toggle"><input type="checkbox" id="modAnimOnly"> 只看会动的</label>
+          <label class="toggle"><input type="checkbox" id="modNewOnly"> 只看本轮新增</label>
+        </div>
+        <p class="module-results" id="modResultCount" role="status" aria-live="polite" aria-atomic="true"></p>
+        <section class="module-info" id="modInfo" aria-labelledby="modInfoTitle" aria-live="polite" aria-atomic="true">
+          <h3 id="modInfoTitle">模块说明</h3><p class="module-info-meta" id="modInfoMeta">聚焦或选择模块，查看说明</p>
+          <p class="hint" id="modInfoHint">每个类别可用方向键浏览，按 Enter 或空格选择。</p>
+          <button class="btn ghost sm" id="btnModuleParameters" type="button" aria-controls="moduleParamsPanel" hidden>调节此模块</button>
+        </section>
+        <div class="modules" id="modules"></div>
+        <p class="empty-state" id="modEmpty" role="status" hidden>没有匹配的模块，可更换类别、取消勾选条件或重置筛选。</p>
+      </section>
+
+      <!-- 主题 -->
+      <section class="pane" id="paneTheme" role="tabpanel" aria-labelledby="tabTheme">
+        <div class="pane-head">
+          <b>主题风格</b><span>调整整体色温与光效气质</span>
+          <em id="themeName">—</em>
+        </div>
+        <div class="fam-strip" id="themes"></div>
+
+        <section class="text-animation-panel" id="textAnimPanel" aria-labelledby="textAnimHeading">
+          <div class="pane-head"><b id="textAnimHeading">文字动画</b><em id="textAnimStatus">关闭</em></div>
+          <p class="hint">颜色与运动可以组合，直接应用于当前称号。</p>
+          <fieldset class="text-anim-group">
+            <legend>颜色变化</legend>
+            <div class="text-anim-options" id="textAnimColors" role="group" aria-label="文字颜色动画" aria-describedby="textAnimColorHint"></div>
+            <p class="hint" id="textAnimColorHint">保留当前字材与颜色。</p>
+          </fieldset>
+          <fieldset class="text-anim-group">
+            <legend>文字运动</legend>
+            <div class="text-anim-options" id="textAnimMotions" role="group" aria-label="文字运动动画" aria-describedby="textAnimMotionHint"></div>
+            <p class="hint" id="textAnimMotionHint">文字保持静止。</p>
+          </fieldset>
+          <div class="form">
+            <label class="field">播放速度
+              <select id="textAnimSpeed">
+                <option value="0.5">0.5× · 慢</option><option value="0.75">0.75×</option><option value="1" selected>1× · 标准</option><option value="1.5">1.5×</option><option value="2">2× · 快</option>
+              </select>
+            </label>
+            <label class="field">作用范围
+              <select id="textAnimScope"><option value="all">主字与后缀</option><option value="main">仅主字</option><option value="suffix">仅后缀</option></select>
+            </label>
+            <label class="field wide text-anim-strength"><span>效果强度<output id="textAnimStrengthValue" for="textAnimStrength">65%</output></span><input id="textAnimStrength" type="range" min="0.1" max="1" step="any" value="0.65" aria-describedby="textAnimHint"></label>
+          </div>
+          <div class="text-anim-actions"><button class="btn ghost sm" id="btnTextAnimReplay" type="button">重播文字动画</button><button class="btn quiet sm" id="btnTextAnimClear" type="button">关闭全部</button></div>
+          <p class="hint" id="textAnimHint" role="status" aria-live="polite">选择一种颜色变化或文字运动，查看动画效果。</p>
+        </section>
+
+        <div class="pane-head" style="margin-top:18px">
+          <b>自定义文案</b><span>编辑文字、编号与配色</span>
+        </div>
+        <div class="motion-ideas" role="group" aria-label="新文字动画快捷组合"><button class="btn ghost sm" type="button" data-motion-idea="popin">试试逐字弹入</button><button class="btn ghost sm" type="button" data-motion-idea="unfold">试试折页展开</button><button class="btn ghost sm" type="button" data-motion-idea="assemble">试试碎片归位</button></div>
+        <div class="custom-entry" id="customEntry"><p class="hint">复制当前预览的称号到「自定义」系列，保留这套样式，继续改写文字。</p><button class="btn ghost sm" id="btnCustomizeInPanel" type="button" data-customize-current aria-controls="customPanel">复制当前称号并编辑</button></div>
+        <div id="customPanel">
+          <div class="form">
+            <label class="field">主字<input id="czMain" size="8"></label>
+            <label class="field">后缀<input id="czSuffix" size="5"></label>
+            <label class="field">铭文<input id="czDesc" size="10"></label>
+            <label class="field">英文<input id="czEn" size="10"></label>
+            <label class="field">徽记<input id="czMark" size="3"></label>
+            <label class="field">编号<input id="czCode" size="6"></label>
+            <label class="field wide">颜色<input id="czColor" type="color" value="#ffd75e"></label>
+          </div>
+          <p class="hint">文字过长时先缩小字号，仍超宽则显示省略号；原文会完整保留在配置中。</p>
+          <div class="workshop-entry"><button class="btn ghost" type="button" data-open-production="batch">用当前样式批量制作文案 ↗</button></div>
+        </div>
+      </section>
+
+      <!-- 素材工坊：复用当前样式，独立保存制作清单 -->
+      <section class="pane" id="paneMake" role="tabpanel" aria-labelledby="tabMake">
+        <div class="pane-head"><b>素材工坊</b><span>从一条称号，制作一套可用素材</span></div>
+        <p class="workshop-intro">精灵图收齐一个动画循环；批量文案共用当前样式。制作清单和排布参数会随配置一起保存。</p>
+        <details class="workshop-card" id="spriteWorkshop" open>
+          <summary>动画精灵图<span>PNG + 帧数据</span></summary>
+          <div class="workshop-body">
+            <p class="hint" id="spriteCurrent">使用当前选中的称号，按时间轴顺序排列完整一轮动画。</p>
+            <div class="form">
+              <label class="field">每行帧数<select id="optSpriteColumns"><option value="0">自动排布</option><option value="1">1 列 · 竖条</option><option value="2">2 列</option><option value="4">4 列</option><option value="8">8 列</option></select></label>
+              <label class="field">单帧倍率<select id="optSpriteScale"><option value="1">1× · 560×160</option><option value="1.5">1.5× · 840×240</option><option value="2">2× · 1120×320</option></select></label>
+              <label class="field wide">透明边距<select id="optSpritePadding"><option value="0">0 px · 紧密拼接</option><option value="2" selected>2 px · 留出间隔</option><option value="4">4 px</option><option value="8">8 px</option></select></label>
+            </div>
+            <p class="workshop-metrics" id="spriteEstimate" role="status" aria-live="polite"></p>
+            <div class="sprite-layout" id="spriteLayout" aria-hidden="true"></div>
+            <p class="workshop-caption">上图为帧位置示意，按从左到右、从上到下读取。透明边距不裁剪画面；每帧的坐标、时长与原始尺寸写入 JSON。</p>
+            <div class="workshop-actions"><button class="btn primary" id="btnSpriteZip" type="button">导出精灵图素材包</button><button class="btn quiet" type="button" data-workshop-output>调整动画帧数</button></div>
+            <p class="workshop-caption" id="spritePackageNote">素材包包含精灵图 PNG、帧数据 JSON 和本次配置。帧数与整体速度沿用当前动画设置。</p>
+          </div>
+        </details>
+        <details class="workshop-card" id="batchWorkshop">
+          <summary>批量文案<span>最多 32 条</span></summary>
+          <div class="workshop-body">
+            <p class="hint">一次准备多条文案，共用当前的构图、模块与动画。每条仍可单独检查并复制到编辑器。</p>
+            <label class="field">粘贴格式<select id="batchFormat"><option value="lines">一行一个主字</option><option value="tsv">表格多列 · Tab 分隔</option></select></label>
+            <p class="workshop-caption" id="batchFormatHint">每行填写一个主字，其余字段使用下方固定默认值。空行自动忽略。</p>
+            <label class="field">制作清单<textarea id="batchText" rows="7" maxlength="32768" spellcheck="false" placeholder="晨雾巡行&#10;旧街拾光&#10;归途守望" aria-describedby="batchFormatHint batchStatus"></textarea></label>
+            <div class="workshop-actions"><button class="btn ghost" id="btnBatchExample" type="button" title="替换清单为示例，可撤销">填入示例</button><button class="btn ghost" id="btnBatchFamily" type="button" title="将当前系列文案复制到清单，可撤销">载入当前系列</button></div>
+            <details class="batch-defaults" id="batchDefaultsPanel"><summary>固定默认值 · 缺少的列从这里补齐</summary><p class="workshop-caption" id="batchDefaultsHint">更换主预览称号不会改变这些默认值；空白单元格会保留为空。</p><button class="btn quiet sm" id="btnBatchDefaults" type="button">从当前称号复制默认值</button><div class="form" id="batchDefaultsFields"></div></details>
+            <p class="batch-status" id="batchStatus" role="status" aria-live="polite">清单为空，先填入文案。</p>
+            <ul class="batch-errors" id="batchErrors" aria-label="文案待修正项" hidden></ul>
+            <label class="field">检查条目<select id="batchPreviewItem" aria-controls="batchPreviewCanvas"><option>暂无可预览条目</option></select></label>
+            <div class="batch-preview"><canvas id="batchPreviewCanvas" width="560" height="160" aria-label="批量文案完整静态预览" hidden></canvas><p id="batchPreviewEmpty">填入有效文案后，可在这里检查当前样式。</p></div>
+            <p class="workshop-caption" id="batchPreviewCaption">完整静态预览；动画输出沿用当前样式的效果。</p>
+            <div class="workshop-actions"><button class="btn quiet" id="btnBatchEditItem" type="button" disabled>复制此条到文案编辑器</button></div>
+            <div class="batch-formats"><label class="field">打包内容<select id="batchOutputKind"><option value="0">PNG + 方形图标</option><option value="1">动画 GIF</option></select></label></div>
+            <p class="workshop-metrics" id="batchEstimate" role="status" aria-live="polite"></p>
+            <div class="workshop-actions"><button class="btn primary" id="btnBatchZip" type="button" disabled>生成批量素材包</button><button class="btn quiet" type="button" data-workshop-output>调整输出尺寸</button></div>
+            <p class="workshop-caption">文件名前加条目序号，同名文案也不会互相覆盖。包内附带表格清单、配置与批次清单；自定义文案按项目原创处理。</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- 输出 -->
+      <section class="pane" id="paneOut" role="tabpanel" aria-labelledby="tabOut">
+        <div class="pane-head"><b>输出参数</b><span>按用途选择分辨率与动画大小</span></div>
+        <div class="output-summary-inline" id="outputSummaryInline" aria-live="polite"></div>
+        <div class="form">
+          <label class="field">PNG 倍率
+            <select id="optScale">
+              <option value="1">1x · 560×160</option>
+              <option value="2" selected>2x · 1120×320</option>
+              <option value="3">3x · 1680×480</option>
+            </select>
+          </label>
+          <label class="field">图标尺寸
+            <select id="optIconSize">
+              <option value="128">128</option>
+              <option value="256" selected>256</option>
+              <option value="384">384</option>
+              <option value="512">512</option>
+            </select>
+          </label>
+          <label class="field">GIF 帧数
+            <select id="optFrames">
+              <option value="8">8</option>
+              <option value="12">12</option>
+              <option value="16" selected>16</option>
+              <option value="24">24</option>
+              <option value="32">32</option>
+            </select>
+          </label>
+          <label class="field">帧间隔
+            <select id="optDelay" aria-describedby="gifTimingHint">
+              <option value="40">40 ms</option>
+              <option value="60" selected>60 ms</option>
+              <option value="80">80 ms</option>
+              <option value="100">100 ms</option>
+            </select>
+          </label>
+          <label class="field">GIF 倍率
+            <select id="optGifScale">
+              <option value="1" selected>1x · 560×160</option>
+              <option value="1.5">1.5x · 840×240</option>
+              <option value="2">2x · 1120×320</option>
+            </select>
+          </label>
+          <label class="field">GIF 色数
+            <select id="optColors">
+              <option value="64">64</option>
+              <option value="128" selected>128</option>
+              <option value="192">192</option>
+              <option value="256">256</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="gifTimingHint" role="status" aria-live="polite">文字动画关闭时，使用手动帧间隔。</p>
+        <p class="hint" style="margin:10px 0 0">有动效或「▶」装饰时逐帧渲染；只导出 PNG 时取动画装饰的中间态。</p>
+
+        <div class="workshop-entry"><button class="btn ghost" type="button" data-open-production="sprite">制作动画精灵图与帧数据 ↗</button></div>
+        <div class="output-shortcuts"><button class="btn primary" type="button" data-export-target="btnZip">打包当前系列</button><button class="btn ghost" type="button" data-export-target="btnPoster">导出合集海报</button></div>
+        <div class="pane-head" style="margin-top:18px"><b>保存与分享</b><span>保留文案、样式与输出参数</span></div>
+        <div class="mod-tools">
+          <button class="btn ghost sm" id="btnShare">复制分享链接</button>
+          <button class="btn ghost sm" id="btnFav">收藏当前</button>
+        </div>
+        <div class="fam-strip" id="favList" aria-label="收藏"></div>
+
+        <div class="pane-head" style="margin-top:18px"><b>称号图标</b><span>当前系列的方形图标，按上方尺寸导出</span></div>
+        <div class="icon-grid" id="iconGrid"></div>
+      </section>
+    </div>
+
+
+    <div class="console-foot"><span>当前配置</span><b id="stackSummary">—</b><span id="moduleSummary"></span></div>
+  </aside>
+</main>
+<footer class="foot"><div class="status-stats"><span><b id="statTemplates">43</b> 模板</span><span><b id="statFamilies">17</b> 系列</span><span><b id="statModules">139</b> 模块</span><span><b id="statThemes">6</b> 主题</span></div><span class="foot-note">镜中都市 · 文案、样式与导出一体工作台</span><span>PNG / GIF / ICON</span></footer>
+<button class="editor-backdrop" id="editorBackdrop" type="button" aria-label="关闭当前面板" tabindex="-1" hidden></button>
+<nav class="mobile-editbar" id="mobileEditBar" aria-label="工作台快捷操作"><button class="btn ghost" id="btnMobileLibrary" type="button" data-open-library aria-controls="libraryPanel" aria-expanded="false">称号库</button><button class="btn ghost" id="btnMobilePreview" type="button">看预览</button><button class="btn primary" id="btnMobileEdit" type="button" data-open-editor="" aria-controls="console" aria-expanded="false">编辑样式</button><button class="btn ghost" id="btnMobileOutput" type="button" data-open-editor="out" aria-controls="console" aria-expanded="false">输出设置</button></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="模块/gif.js"></script>
+<script src="模块/core.js"></script>
+<script src="模块/parameters.js"></script>
+<script src="模块/text-anim.js"></script>
+<script src="模块/jobs.js"></script>
+<script src="模块/themes.js"></script>
+<script src="模块/icon.js"></script>
+<script src="模块/icon2.js"></script>
+<script src="模块/zip.js"></script>
+<script src="模块/mod-bg.js"></script>
+<script src="模块/mod-plate.js"></script>
+<script src="模块/mod-frame.js"></script>
+<script src="模块/mod-badge.js"></script>
+<script src="模块/mod-text.js"></script>
+<script src="模块/mod-deco.js"></script>
+<script src="模块/mod-motion.js"></script>
+<script src="模块/mod-expansion.js"></script>
+<script src="模块/mod-more.js"></script>
+<script src="模块/mod-v2.js"></script>
+<script src="模块/mod-layout.js"></script>
+<script src="模块/mod-structures.js"></script>
+<script src="模块/mod-kinetic.js"></script>
+<script src="模块/families.js"></script>
+<script src="模块/templates.js"></script>
+<script src="模块/batch.js"></script>
+<script src="模块/app.js"></script>
+<script src="模块/production.js"></script>
+<script src="模块/ui.js"></script>
+<script src="模块/workshop.js"></script>
+</body>
+</html>
+
